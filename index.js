@@ -1,6 +1,5 @@
 // first thing I would do is install npm packages npm i, npm i inquiry, npm i mysql2, npm i express
 const express = require("express");
-const fs = require("fs");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
@@ -15,11 +14,10 @@ const db = mysql.createConnection(
     host: "localhost",
     // MySQL username,
     user: "root",
-    // TODO: Add MySQL password here
     password: "",
-    database: "movies_db",
+    database: "office_db",
   },
-  console.log(`Connected to the movies_db database.`)
+  console.log(`Connected to the office_db database.`)
 );
 
 const choices = function () {
@@ -62,7 +60,7 @@ const choices = function () {
     });
 };
 
-// view all employees(invokes SELECT * employee_name which presents?)
+// view all employees(invokes SELECT * employee_name which presents?) -->done
 const showAllEmployees = function () {
   app.get("/api/all-employees", (req, res) => {
     const mysql = `SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary,employee.manager_id AS employee.first_name FROM department INNER JOIN roles ON department.id = roles.id 
@@ -79,11 +77,52 @@ const showAllEmployees = function () {
     });
   });
 };
-// add employee(function with more inquiry)
+// add employee(function with more inquiry)-->done
+const addEmployee = function () {
+  inquirer
+    .prompt([
+      {
+        name: "first_name",
+        type: "input",
+        message: "What is your first name?",
+      },
+      {
+        name: "last_name",
+        type: "input",
+        message: "What is your last name?",
+      },
+      {
+        //check role_id no. which is which. It has not been created yet.
+        name: "role_id",
+        type: "list",
+        message: "role id?",
+        choices: [1, 2, 3, 4, 5, 6],
+      },
+    ])
+    .then(function () {
+      app.post("/api/add-Employee", ({ body }, res) => {
+        const mysql = `INSERT INTO employee (first_name, last_name, role_id)
+    VALUES (?)`;
+        const params = [body.first_name, body.last_name, body.role_id];
 
+        db.query(sql, params, (err, result) => {
+          if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+          }
+          res.json({
+            message: "success",
+            data: body,
+          });
+        });
+      });
+    });
+};
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
 
-// view all roles(invokes SELECT * employee_name which presents?)
+// WIP
+
+// view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
   app.get("/api/roles", (req, res) => {
     const sql = `SELECT id, title FROM roles`;
@@ -100,7 +139,8 @@ const allRoles = function () {
     });
   });
 };
-// add role()(function add new role with more inquiry) --->
+
+// add role()(function add new role with more inquiry) --->done
 
 // Create a role 2 steps inquiry and express
 // Step 1:inquiry bit
@@ -145,9 +185,53 @@ const addRole = function () {
       });
     });
 };
-// view all department(invokes SELECT * employee_name which presents?)
+// view all department(invokes SELECT * employee_name which presents?)-->done
+const viewAllDepartments = function () {
+  app.get("/api/alldepartments", (req, res) => {
+    const sql = `SELECT department_name title FROM department`;
 
+    db.query(sql, (err, rows) => {
+      if (err) {
+        res.status(500).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: "success",
+        data: rows,
+      });
+    });
+  });
+};
 // add department(function create new department with inquiry questions)
+const addDepartment = function () {
+  inquirer
+    .prompt([
+      {
+        name: "department_name",
+        type: "input",
+        message: "Add new department name:",
+      },
+    ])
+    // Step2:express bit read from file?
+    .then(function () {
+      app.post("/api/add-department", ({ body }, res) => {
+        const mysql = `INSERT INTO department (department_name)
+    VALUES (?)`;
+        const params = [body.department_name];
+
+        db.query(sql, params, (err, result) => {
+          if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+          }
+          res.json({
+            message: "success",
+            data: body,
+          });
+        });
+      });
+    });
+};
 
 // quit(invoke exit in sql)
 
