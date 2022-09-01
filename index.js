@@ -2,6 +2,7 @@
 const express = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const QueryString = require("qs");
 const PORT = process.env.PORT || 3001;
 const app = express();
 // Express middleware
@@ -75,6 +76,7 @@ const showAllEmployees = function () {
         data: rows,
       });
     });
+    return choices();
   });
 };
 // add employee(function with more inquiry)-->done
@@ -116,11 +118,72 @@ const addEmployee = function () {
           });
         });
       });
+      return choices();
     });
 };
+//WIP--->
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
+//We join the table which connect the name and role_id to the role.
+const updateRole = function () {
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "What is your id number?",
+      },
+    ])
+    //not sure here-->
+    .then(function () {
+      app.delete("/api/roles/:id", (req, res) => {
+        const sql = `DELETE FROM roles WHERE title = ?`;
+        const params = [req.params.title];
 
-// WIP
+        db.query(sql, params, (err, result) => {
+          if (err) {
+            res.statusMessage(400).json({ error: res.message });
+          } else if (!result.affectedRows) {
+            res.json({
+              message: "id not found",
+            });
+          } else {
+            res.json({
+              message: "Role deleted for id",
+              changes: result.affectedRows,
+              id: req.params.title,
+            });
+          }
+        });
+      });
+    })
+    .then(function () {
+      inquirer.prompt([
+        {
+          name: "title",
+          type: "input",
+          message: "What is your new title?",
+        },
+      ]);
+    });
+  // adding title after deleting title
+  app.post("/api/roles/:id", ({ body }, res) => {
+    const mysql = `INSERT INTO roles (title)
+  VALUES (?)`;
+    const params = [body.title];
+
+    db.query(sql, params, (err, result) => {
+      if (err) {
+        res.status(400).json({ error: err.message });
+        return;
+      }
+      res.json({
+        message: "Updated Role to database",
+        data: body,
+      });
+    });
+    return choices();
+  });
+};
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
@@ -133,15 +196,15 @@ const allRoles = function () {
         return;
       }
       res.json({
-        message: "success",
+        message: "All Roles Displayed",
         data: rows,
       });
     });
+    return choices();
   });
 };
 
 // add role()(function add new role with more inquiry) --->done
-
 // Create a role 2 steps inquiry and express
 // Step 1:inquiry bit
 const addRole = function () {
@@ -159,13 +222,13 @@ const addRole = function () {
       },
       {
         //check department_id no. which is which. It has not been created yet.
-        name: "deprtment_id",
+        name: "department_id",
         type: "list",
-        message: "Department id?",
-        choices: [1, 2, 3, 4],
+        message: "Which department does the role belong to?",
+        choices: ["Engineering", "Finance", "Legal", "Sales", "Services"],
       },
     ])
-    // Step2:express bit read from file?
+    // Step2:read from file?
     .then(function () {
       app.post("/api/add-role", ({ body }, res) => {
         const mysql = `INSERT INTO roles (title, salary, department_id)
@@ -178,11 +241,12 @@ const addRole = function () {
             return;
           }
           res.json({
-            message: "success",
+            message: "New Role has now been added",
             data: body,
           });
         });
       });
+      return choices();
     });
 };
 // view all department(invokes SELECT * employee_name which presents?)-->done
@@ -196,10 +260,11 @@ const viewAllDepartments = function () {
         return;
       }
       res.json({
-        message: "success",
+        message: "All Department Displayed",
         data: rows,
       });
     });
+    return choices();
   });
 };
 // add department(function create new department with inquiry questions)
@@ -225,19 +290,20 @@ const addDepartment = function () {
             return;
           }
           res.json({
-            message: "success",
+            message: "New Department has now been added",
             data: body,
           });
         });
       });
+      return choices();
     });
 };
 
 // quit(invoke exit in sql)
+// WIP -->
+quit();
 
 choices();
-
-// fs write file to data here
 
 // where routing is listening
 app.use((req, res) => {
