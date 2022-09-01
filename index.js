@@ -1,13 +1,26 @@
-// first thing I would do is install npm packages npm i, npm i inquiry, npm i mysql2, npm i express
+// first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i express
+//check which ones requires input list and choices and choices needs to be migrated from database.
+
+// this is not working
+
 const express = require("express");
 const inquirer = require("inquirer");
-const mysql = require("mysql2");
-const QueryString = require("qs");
+const sql = require("mysql2");
 const PORT = process.env.PORT || 3001;
 const app = express();
 // Express middleware
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
+
+// for updated role list: used on line 180
+// WIP need to check if it work
+const updatedRolelist = con.connect(function (err) {
+  if (err) throw err;
+  con.query("SELECT title FROM role", function (err, result, fields) {
+    if (err) throw err;
+    console.log(result);
+  });
+});
 
 // Connect to database
 const db = mysql.createConnection(
@@ -25,6 +38,7 @@ const choices = function () {
   inquirer
     .prompt([
       {
+        //add Bonus questions once this starts working
         name: "office",
         type: "list",
         message: "What would you like to do?",
@@ -160,8 +174,9 @@ const updateRole = function () {
       inquirer.prompt([
         {
           name: "title",
-          type: "input",
+          type: "list",
           message: "What is your new title?",
+          choices: updatedRolelist,
         },
       ]);
     });
@@ -221,7 +236,7 @@ const addRole = function () {
         message: "How much is the salary for this role?",
       },
       {
-        //check department_id no. which is which. It has not been created yet.
+        //check department_id no. which is which. It has not been created yet in seed.
         name: "department_id",
         type: "list",
         message: "Which department does the role belong to?",
@@ -301,9 +316,10 @@ const addDepartment = function () {
 
 // quit(invoke exit in sql)
 // WIP -->
-quit();
-
-choices();
+const quit = function () {
+  // Double check on this?
+  process.exit();
+};
 
 // where routing is listening
 app.use((req, res) => {
@@ -313,3 +329,5 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+choices();

@@ -6,8 +6,8 @@ employee.manager_id AS employee.first_name
 FROM department 
 --table 2 first join 
 INNER JOIN roles 
-ON department.id = roles.id 
+ON department.id = roles.department_id 
 --table 3 2nd join
 INNER JOIN employee 
-ON roles.id = employee.id
+ON roles.id = employee.role_id
 ORDER BY department.id;
