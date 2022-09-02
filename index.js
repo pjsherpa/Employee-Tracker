@@ -15,16 +15,16 @@ app.use(express.json());
 
 // for updated role list: used on line 180
 // WIP need to check if it work
-const updatedRolelist = con.connect(function (err) {
-  if (err) throw err;
-  con.query("SELECT title FROM role", function (err, result, fields) {
-    if (err) throw err;
-    console.log(result);
-  });
-});
+// const updatedRolelist = con.connect(function (err) {
+//   if (err) throw err;
+//   con.query("SELECT title FROM role", function (err, result, fields) {
+//     if (err) throw err;
+//     console.log(result);
+//   });
+// });
 
 // Connect to database
-const db = mysql.createConnection(
+const db = sql.createConnection(
   {
     host: "localhost",
     // MySQL username,
@@ -140,45 +140,45 @@ const addEmployee = function () {
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
 //We join the table which connect the name and role_id to the role.
 //USE app.put instead?
-const updateRole = function () {
-  inquirer
-    .prompt([
-      {
-        name: "id",
-        type: "input",
-        message: "What is your id number?",
-      },
-      {
-        name: "title",
-        type: "list",
-        message: "What is your new title?",
-        choices: updatedRolelist,
-      },
-    ])
-    //not sure here-->
-    .then(function () {
-      app.put("/api/roles/:id", (req, res) => {
-        const sql = `DELETE FROM roles WHERE title = ?`;
-        const params = [req.params.title];
+// const updateRole = function () {
+//   inquirer
+//     .prompt([
+//       {
+//         name: "id",
+//         type: "input",
+//         message: "What is your id number?",
+//       },
+//       {
+//         name: "title",
+//         type: "list",
+//         message: "What is your new title?",
+//         choices: updatedRolelist,
+//       },
+//     ])
+//     //not sure here-->
+//     .then(function () {
+//       app.put("/api/roles/:id", (req, res) => {
+//         const sql = `DELETE FROM roles WHERE title = ?`;
+//         const params = [req.params.title];
 
-        db.query(sql, params, (err, result) => {
-          if (err) {
-            res.statusMessage(400).json({ error: res.message });
-          } else if (!result.affectedRows) {
-            res.json({
-              message: "id not found",
-            });
-          } else {
-            res.json({
-              message: "Role updated for id",
-              changes: result.affectedRows,
-              id: req.params.id,
-            });
-          }
-        });
-      });
-    });
-};
+//         db.query(sql, params, (err, result) => {
+//           if (err) {
+//             res.statusMessage(400).json({ error: res.message });
+//           } else if (!result.affectedRows) {
+//             res.json({
+//               message: "id not found",
+//             });
+//           } else {
+//             res.json({
+//               message: "Role updated for id",
+//               changes: result.affectedRows,
+//               id: req.params.id,
+//             });
+//           }
+//         });
+//       });
+//     });
+// };
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
@@ -300,7 +300,6 @@ const quit = function () {
   // Double check on this?
   process.exit();
 };
-choices();
 
 // where routing is listening
 app.use((req, res) => {
@@ -310,3 +309,4 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+choices();
