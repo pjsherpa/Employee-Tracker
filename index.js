@@ -30,9 +30,9 @@ const db = mysql.createConnection(
     // MySQL username,
     user: "root",
     password: "",
-    database: "office_db",
+    database: "employeetracker_db",
   },
-  console.log(`Connected to the office_db database.`)
+  console.log(`Connected to the employeetracker_db database.`)
 );
 
 const choices = function () {
@@ -140,7 +140,7 @@ const addEmployee = function () {
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
 //We join the table which connect the name and role_id to the role.
 //USE app.put instead?
-/* const updateRole = function () {
+const updateRole = function () {
   inquirer
     .prompt([
       {
@@ -148,12 +148,18 @@ const addEmployee = function () {
         type: "input",
         message: "What is your id number?",
       },
+      {
+        name: "title",
+        type: "list",
+        message: "What is your new title?",
+        choices: updatedRolelist,
+      },
     ])
     //not sure here-->
     .then(function () {
-      app.delete("/api/roles/:id", (req, res) => {
+      app.put("/api/roles/:id", (req, res) => {
         const sql = `DELETE FROM roles WHERE title = ?`;
-        const params = [req.params.id];
+        const params = [req.params.title];
 
         db.query(sql, params, (err, result) => {
           if (err) {
@@ -164,44 +170,15 @@ const addEmployee = function () {
             });
           } else {
             res.json({
-              message: "Role deleted for id",
+              message: "Role updated for id",
               changes: result.affectedRows,
               id: req.params.id,
             });
           }
         });
       });
-    })
-    .then(function () {
-      inquirer.prompt([
-        {
-          name: "title",
-          type: "list",
-          message: "What is your new title?",
-          choices: updatedRolelist,
-        },
-      ]);
     });
-  // adding title after deleting title
-  app.post("/api/roles/:id", ({ body }, res) => {
-    const mysql = `INSERT INTO roles (title)
-  VALUES (?)`;
-    const params = [body.title];
-
-    db.query(sql, params, (err, result) => {
-      if (err) {
-        res.status(400).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "Updated Role to database",
-        data: body,
-      });
-    });
-    return choices();
-  });
 };
-*/
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
@@ -323,6 +300,7 @@ const quit = function () {
   // Double check on this?
   process.exit();
 };
+choices();
 
 // where routing is listening
 app.use((req, res) => {
@@ -332,5 +310,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-choices();
