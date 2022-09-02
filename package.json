@@ -3,5 +3,24 @@
     "express": "^4.18.1",
     "inquirer": "^9.1.1",
     "mysql2": "^2.3.3"
-  }
-  }
+  },
+  "name": "challenge-12",
+  "version": "1.0.0",
+  "main": "index.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pjsherpa/Employee-Tracker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pjsherpa/Employee-Tracker/issues"
+  },
+  "homepage": "https://github.com/pjsherpa/Employee-Tracker#readme",
+  "description": ""
+}

@@ -1,6 +1,7 @@
 // first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i express
 //check which ones requires input list and choices and choices needs to be migrated from database.
 
+//node index.js to invoke.
 // this is not working
 
 const express = require("express");
@@ -138,7 +139,8 @@ const addEmployee = function () {
 //WIP--->
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
 //We join the table which connect the name and role_id to the role.
-const updateRole = function () {
+//USE app.put instead?
+/* const updateRole = function () {
   inquirer
     .prompt([
       {
@@ -151,7 +153,7 @@ const updateRole = function () {
     .then(function () {
       app.delete("/api/roles/:id", (req, res) => {
         const sql = `DELETE FROM roles WHERE title = ?`;
-        const params = [req.params.title];
+        const params = [req.params.id];
 
         db.query(sql, params, (err, result) => {
           if (err) {
@@ -164,7 +166,7 @@ const updateRole = function () {
             res.json({
               message: "Role deleted for id",
               changes: result.affectedRows,
-              id: req.params.title,
+              id: req.params.id,
             });
           }
         });
@@ -199,6 +201,7 @@ const updateRole = function () {
     return choices();
   });
 };
+*/
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {

@@ -1,13 +1,21 @@
---link made from the id no.'s as all 3 tables have id no.'s.
-SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, 
---will this give the manager's name rather than the manager_id?
-employee.manager_id AS employee.first_name
---table 1
-FROM department 
---table 2 first join 
-INNER JOIN roles 
+SELECT roles.id, roles.title, department.department_name, roles.salary, employee.first_name
+FROM roles 
+JOIN department 
 ON department.id = roles.department_id 
---table 3 2nd join
-INNER JOIN employee 
-ON roles.id = employee.role_id
-ORDER BY department.id;
+ORDER BY department.id
+LEFT JOIN employee
+ON employee.role_id=roles.title;
+
+-- SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, 
+-- employee.manager_id
+-- FROM employee AS E
+-- INNER JOIN department  AS D
+-- ON department.id = roles.department_id 
+-- LEFT JOIN roles AS R 
+-- ON E.id = employee.role_id;
+
+
+SELECT department.id, roles.department_id, employee.role_id
+FROM department
+INNER JOIN roles
+ON 
