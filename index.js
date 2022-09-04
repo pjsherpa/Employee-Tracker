@@ -78,7 +78,7 @@ function showAllEmployees() {
       res.status(500).json({ error: err.message });
     }
     console.table(rows);
-    console.log("Employees viewed!\n");
+    console.log("Employees viewed!");
   });
   return choices();
 }
@@ -124,7 +124,7 @@ const addEmployee = function () {
       return choices();
     });
 };
-//WIP--->
+
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
 // We join the table which connect the name and role_id to the role.
 
@@ -144,7 +144,8 @@ const updateRole = function () {
       },
     ])
     //not sure here-->
-    .then(function () {
+    .then(function (ans) {
+      const title = ans.title;
       // this works-->
       app.put("/api/roles/:id", ({ body }, res) => {
         const sql = `UPDATE roles SET title = ? WHERE id = ?`;
@@ -167,6 +168,7 @@ const updateRole = function () {
         });
       });
     });
+  return choices();
 };
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
@@ -255,29 +257,25 @@ const addDepartment = function () {
       },
     ])
     // Step2:express bit read from file?
-    .then(function () {
+    .then(function (ans) {
+      const department_name = ans.department_name;
       // this works--->
-      app.post("/api/add-department", ({ body }, res) => {
-        const sql = `INSERT INTO department (department_name)
+      // app.post("/api/add-department", (req, res) => {
+      const sql = `INSERT INTO department (department_name)
     VALUES (?)`;
-        const params = [body.department_name];
+      const params = [department_name];
 
-        db.query(sql, params, (err, result) => {
-          if (err) {
-            res.status(400).json({ error: err.message });
-            return;
-          }
-          res.json({
-            message: "New Department has now been added",
-            data: body,
-          });
-        });
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          res.status(400).json({ error: err.message });
+          return;
+        }
+        console.log("New Department has now been added");
+        sql;
       });
+      return choices();
     });
-  return choices();
 };
-
-// quit(invoke exit in sql)
 
 const quit = function () {
   process.exit();
