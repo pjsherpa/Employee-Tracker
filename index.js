@@ -83,7 +83,7 @@ function showAllEmployees() {
   return choices();
 }
 // }
-// add employee(function with more inquiry)-->done
+// add employee(function with more inquiry)WIP-->done
 const addEmployee = function () {
   inquirer
     .prompt([
@@ -98,28 +98,34 @@ const addEmployee = function () {
         message: "What is your last name?",
       },
       {
-        //check role_id no. which is which. It has not been created yet.
         name: "role_id",
         type: "list",
         message: "role id?",
         choices: [1, 2, 3, 4, 5, 6],
       },
+      {
+        name: "manager_id",
+        type: "list",
+        message: "Manager id?",
+        choices: [1, 3, 5, 7],
+      },
     ])
-    .then(function () {
-      // this works--->
-      app.post("/api/add-Employee", ({ body }, res) => {
-        const sql = `INSERT INTO employee (first_name) VALUES (?)`;
-        const params = [ans.first_name, ans.last_name, ans.role_id];
-        db.query(sql, params, (err, result) => {
-          if (err) {
-            res.status(400).json({ error: err.message });
-            return;
-          }
-          res.json({
-            message: "Employee has now been added",
-            data: body,
-          });
-        });
+    .then(function (ans) {
+      // WIP not working--->
+      const first_name = ans.first_name;
+      const last_name = ans.last_name;
+      const role_id = ans.role_id;
+      const manager_id = ans.manager_id;
+
+      const sql = `INSERT INTO employee (first_name) 
+      VALUES (?)`;
+      const params = [first_name, last_name, role_id, manager_id];
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log("Employee has not been added\n");
+        }
+        console.log("Employee has now been added\n");
+        sql;
       });
       return choices();
     });
@@ -146,50 +152,38 @@ const updateRole = function () {
     //not sure here-->
     .then(function (ans) {
       const title = ans.title;
-      // this works-->
-      app.put("/api/roles/:id", ({ body }, res) => {
-        const sql = `UPDATE roles SET title = ? WHERE id = ?`;
-        const params = [body.title, body.id];
-
-        db.query(sql, params, (err, result) => {
-          if (err) {
-            res.status(400).json({ error: res.message });
-          } else if (!result.affectedRows) {
-            res.json({
-              message: "id not found",
-            });
-          } else {
-            res.json({
-              message: "Role updated for id",
-              data: body,
-              changes: result.affectedRows,
-            });
-          }
-        });
+      const id = ans.id;
+      const sql = `UPDATE roles SET title = ? WHERE id = ?`;
+      const params = [title, id];
+      //WIP--->
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log("Role has not updated\n");
+        } else {
+          console.log("Role has now been updated\n");
+          sql;
+        }
       });
+      return choices();
     });
-  return choices();
 };
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
-  // app.get("/api/roles", (req, res) => {
-  const sql = `SELECT id, title FROM roles`;
+  const sql = `SELECT id, title, salary, department_id FROM roles`;
 
   db.query(sql, (err, rows) => {
     if (err) {
       res.status(500).json({ error: err.message });
       return;
     }
+    console.log("View roles\n");
     console.table(rows);
   });
   return choices();
 };
-// };
 
 // add role()(function add new role with more inquiry) --->done
-// Create a role 2 steps inquiry and express
-// Step 1:inquiry bit
 const addRole = function () {
   inquirer
     .prompt([
@@ -212,26 +206,24 @@ const addRole = function () {
       },
     ])
 
-    .then(function () {
-      //this works
-      app.post("/api/add-role", ({ body }, res) => {
-        const sql = `INSERT INTO roles (title)
-    VALUES (?)`;
-        const params = [body.title, body.salary, body.department_id];
+    .then(function (ans) {
+      const title = ans.title;
+      const salary = ans.salary;
+      const department_id = ans.department_id;
 
-        db.query(sql, params, (err, result) => {
-          if (err) {
-            res.status(400).json({ error: err.message });
-            return;
-          }
-          res.json({
-            message: "New Role has now been added",
-            data: body,
-          });
-        });
+      const sql = `INSERT INTO roles (title)
+    VALUES (?)`;
+      const params = [title, salary, department_id];
+
+      db.query(sql, params, (err, result) => {
+        if (err) {
+          console.log("No role added");
+        }
+        console.log("New Role has now been added\n");
+        sql;
       });
+      return choices();
     });
-  return choices();
 };
 // view all department(invokes SELECT * employee_name which presents?)-->done
 const viewAllDepartments = function () {
@@ -256,21 +248,19 @@ const addDepartment = function () {
         message: "Add new department name:",
       },
     ])
-    // Step2:express bit read from file?
+    // Step2:express bit read from choice made?
     .then(function (ans) {
       const department_name = ans.department_name;
-      // this works--->
-      // app.post("/api/add-department", (req, res) => {
+
       const sql = `INSERT INTO department (department_name)
     VALUES (?)`;
       const params = [department_name];
 
       db.query(sql, params, (err, result) => {
         if (err) {
-          res.status(400).json({ error: err.message });
-          return;
+          console.log("Department has not been added\n");
         }
-        console.log("New Department has now been added");
+        console.log("New Department has now been added\n");
         sql;
       });
       return choices();
