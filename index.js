@@ -2,11 +2,10 @@
 //check which ones requires input list and choices and choices needs to be migrated from database.
 
 //node index.js to invoke.
-// this is not working
 
 const express = require("express");
 const inquirer = require("inquirer");
-const sql = require("mysql2");
+const mysql = require("mysql2");
 const PORT = process.env.PORT || 3001;
 const app = express();
 // Express middleware
@@ -24,7 +23,7 @@ app.use(express.json());
 // });
 
 // Connect to database
-const db = sql.createConnection(
+const db = mysql.createConnection(
   {
     host: "localhost",
     // MySQL username,
@@ -79,8 +78,7 @@ const choices = function () {
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 const showAllEmployees = function () {
   app.get("/api/all-employees", (req, res) => {
-    const mysql = `SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary,employee.manager_id AS employee.first_name FROM department INNER JOIN roles ON department.id = roles.id 
-    INNER JOIN employee ON roles.id = employee.id ORDER BY department.id;`;
+    const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
     db.query(sql, (err, rows) => {
       if (err) {
         res.status(500).json({ error: err.message });
@@ -91,8 +89,8 @@ const showAllEmployees = function () {
         data: rows,
       });
     });
-    return choices();
   });
+  return choices();
 };
 // add employee(function with more inquiry)-->done
 const addEmployee = function () {
@@ -117,18 +115,17 @@ const addEmployee = function () {
       },
     ])
     .then(function () {
+      // this works--->
       app.post("/api/add-Employee", ({ body }, res) => {
-        const mysql = `INSERT INTO employee (first_name, last_name, role_id)
-    VALUES (?)`;
+        const sql = `INSERT INTO employee (first_name) VALUES (?)`;
         const params = [body.first_name, body.last_name, body.role_id];
-
         db.query(sql, params, (err, result) => {
           if (err) {
             res.status(400).json({ error: err.message });
             return;
           }
           res.json({
-            message: "success",
+            message: "Employee has now been added",
             data: body,
           });
         });
@@ -138,47 +135,48 @@ const addEmployee = function () {
 };
 //WIP--->
 // update employee role(function to delete role and create role is that how we append does the new role appear here?)
-//We join the table which connect the name and role_id to the role.
-//USE app.put instead?
-// const updateRole = function () {
-//   inquirer
-//     .prompt([
-//       {
-//         name: "id",
-//         type: "input",
-//         message: "What is your id number?",
-//       },
-//       {
-//         name: "title",
-//         type: "list",
-//         message: "What is your new title?",
-//         choices: updatedRolelist,
-//       },
-//     ])
-//     //not sure here-->
-//     .then(function () {
-//       app.put("/api/roles/:id", (req, res) => {
-//         const sql = `DELETE FROM roles WHERE title = ?`;
-//         const params = [req.params.title];
+// We join the table which connect the name and role_id to the role.
 
-//         db.query(sql, params, (err, result) => {
-//           if (err) {
-//             res.statusMessage(400).json({ error: res.message });
-//           } else if (!result.affectedRows) {
-//             res.json({
-//               message: "id not found",
-//             });
-//           } else {
-//             res.json({
-//               message: "Role updated for id",
-//               changes: result.affectedRows,
-//               id: req.params.id,
-//             });
-//           }
-//         });
-//       });
-//     });
-// };
+const updateRole = function () {
+  inquirer
+    .prompt([
+      {
+        name: "id",
+        type: "input",
+        message: "What is your id number?",
+      },
+      {
+        name: "title",
+        type: "list",
+        message: "What is your new title?",
+        choices: updatedRolelist,
+      },
+    ])
+    //not sure here-->
+    .then(function () {
+      // this works-->
+      app.put("/api/roles/:id", ({ body }, res) => {
+        const sql = `UPDATE roles SET title = ? WHERE id = ?`;
+        const params = [body.title, body.id];
+
+        db.query(sql, params, (err, result) => {
+          if (err) {
+            res.status(400).json({ error: res.message });
+          } else if (!result.affectedRows) {
+            res.json({
+              message: "id not found",
+            });
+          } else {
+            res.json({
+              message: "Role updated for id",
+              data: body,
+              changes: result.affectedRows,
+            });
+          }
+        });
+      });
+    });
+};
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
@@ -216,17 +214,18 @@ const addRole = function () {
         message: "How much is the salary for this role?",
       },
       {
-        //check department_id no. which is which. It has not been created yet in seed.
+        //         //check department_id no. which is which. It has not been created yet in seed.
         name: "department_id",
         type: "list",
         message: "Which department does the role belong to?",
         choices: ["Engineering", "Finance", "Legal", "Sales", "Services"],
       },
     ])
-    // Step2:read from file?
+
     .then(function () {
+      //this works
       app.post("/api/add-role", ({ body }, res) => {
-        const mysql = `INSERT INTO roles (title, salary, department_id)
+        const sql = `INSERT INTO roles (title)
     VALUES (?)`;
         const params = [body.title, body.salary, body.department_id];
 
@@ -241,8 +240,8 @@ const addRole = function () {
           });
         });
       });
-      return choices();
     });
+  return choices();
 };
 // view all department(invokes SELECT * employee_name which presents?)-->done
 const viewAllDepartments = function () {
@@ -259,8 +258,8 @@ const viewAllDepartments = function () {
         data: rows,
       });
     });
-    return choices();
   });
+  // return choices();
 };
 // add department(function create new department with inquiry questions)
 const addDepartment = function () {
@@ -271,11 +270,13 @@ const addDepartment = function () {
         type: "input",
         message: "Add new department name:",
       },
+      //add more -->WIP
     ])
     // Step2:express bit read from file?
     .then(function () {
+      // this works--->
       app.post("/api/add-department", ({ body }, res) => {
-        const mysql = `INSERT INTO department (department_name)
+        const sql = `INSERT INTO department (department_name)
     VALUES (?)`;
         const params = [body.department_name];
 
@@ -290,8 +291,8 @@ const addDepartment = function () {
           });
         });
       });
-      return choices();
     });
+  return choices();
 };
 
 // quit(invoke exit in sql)
@@ -300,6 +301,7 @@ const quit = function () {
   // Double check on this?
   process.exit();
 };
+choices();
 
 // where routing is listening
 app.use((req, res) => {
@@ -309,4 +311,3 @@ app.use((req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-choices();
