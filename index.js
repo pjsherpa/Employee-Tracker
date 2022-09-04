@@ -6,6 +6,7 @@
 const express = require("express");
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+
 const PORT = process.env.PORT || 3001;
 const app = express();
 // Express middleware
@@ -14,13 +15,6 @@ app.use(express.json());
 
 // for updated role list: used on line 180
 // WIP need to check if it work
-// const updatedRolelist = con.connect(function (err) {
-//   if (err) throw err;
-//   con.query("SELECT title FROM role", function (err, result, fields) {
-//     if (err) throw err;
-//     console.log(result);
-//   });
-// });
 
 // Connect to database
 const db = mysql.createConnection(
@@ -31,7 +25,7 @@ const db = mysql.createConnection(
     password: "",
     database: "employeetracker_db",
   },
-  console.log(`Connected to the employeetracker_db database.`)
+  console.log(`Connected to the employeetracker_db.`)
 );
 
 const choices = function () {
@@ -75,23 +69,20 @@ const choices = function () {
     });
 };
 
+choices();
 // view all employees(invokes SELECT * employee_name which presents?) -->done
-const showAllEmployees = function () {
-  app.get("/api/all-employees", (req, res) => {
-    const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "success",
-        data: rows,
-      });
-    });
+function showAllEmployees() {
+  const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    }
+    console.table(rows);
+    console.log("Employees viewed!\n");
   });
   return choices();
-};
+}
+// }
 // add employee(function with more inquiry)-->done
 const addEmployee = function () {
   inquirer
@@ -118,7 +109,7 @@ const addEmployee = function () {
       // this works--->
       app.post("/api/add-Employee", ({ body }, res) => {
         const sql = `INSERT INTO employee (first_name) VALUES (?)`;
-        const params = [body.first_name, body.last_name, body.role_id];
+        const params = [ans.first_name, ans.last_name, ans.role_id];
         db.query(sql, params, (err, result) => {
           if (err) {
             res.status(400).json({ error: err.message });
@@ -149,7 +140,7 @@ const updateRole = function () {
         name: "title",
         type: "list",
         message: "What is your new title?",
-        choices: updatedRolelist,
+        choices: [1, 2, , 3, 4],
       },
     ])
     //not sure here-->
@@ -180,22 +171,19 @@ const updateRole = function () {
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
 const allRoles = function () {
-  app.get("/api/roles", (req, res) => {
-    const sql = `SELECT id, title FROM roles`;
+  // app.get("/api/roles", (req, res) => {
+  const sql = `SELECT id, title FROM roles`;
 
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "All Roles Displayed",
-        data: rows,
-      });
-    });
-    return choices();
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+      return;
+    }
+    console.table(rows);
   });
+  return choices();
 };
+// };
 
 // add role()(function add new role with more inquiry) --->done
 // Create a role 2 steps inquiry and express
@@ -245,22 +233,17 @@ const addRole = function () {
 };
 // view all department(invokes SELECT * employee_name which presents?)-->done
 const viewAllDepartments = function () {
-  app.get("/api/alldepartments", (req, res) => {
-    const sql = `SELECT department_name title FROM department`;
+  const sql = `SELECT department_name title FROM department`;
 
-    db.query(sql, (err, rows) => {
-      if (err) {
-        res.status(500).json({ error: err.message });
-        return;
-      }
-      res.json({
-        message: "All Department Displayed",
-        data: rows,
-      });
-    });
+  db.query(sql, (err, rows) => {
+    if (err) {
+      res.status(500).json({ error: err.message });
+    }
+    console.table(rows);
   });
-  // return choices();
+  return choices();
 };
+
 // add department(function create new department with inquiry questions)
 const addDepartment = function () {
   inquirer
@@ -270,7 +253,6 @@ const addDepartment = function () {
         type: "input",
         message: "Add new department name:",
       },
-      //add more -->WIP
     ])
     // Step2:express bit read from file?
     .then(function () {
@@ -296,12 +278,10 @@ const addDepartment = function () {
 };
 
 // quit(invoke exit in sql)
-// WIP -->
+
 const quit = function () {
-  // Double check on this?
   process.exit();
 };
-choices();
 
 // where routing is listening
 app.use((req, res) => {
