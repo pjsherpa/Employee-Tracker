@@ -13,9 +13,6 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// for updated role list: used on line 180
-// WIP need to check if it work
-
 // Connect to database
 const db = mysql.createConnection(
   {
@@ -69,13 +66,12 @@ const choices = function () {
     });
 };
 
-choices();
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 function showAllEmployees() {
   const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
   db.query(sql, (err, rows) => {
     if (err) {
-      res.status(500).json({ error: err.message });
+      console.log("error");
     }
     console.table(rows);
     console.log("Employees viewed!");
@@ -83,7 +79,7 @@ function showAllEmployees() {
   return choices();
 }
 // }
-// add employee(function with more inquiry)WIP-->done
+// add employee(function with more inquiry)WIP-->
 const addEmployee = function () {
   inquirer
     .prompt([
@@ -103,23 +99,23 @@ const addEmployee = function () {
         message: "role id?",
         choices: [1, 2, 3, 4, 5, 6],
       },
-      {
-        name: "manager_id",
-        type: "list",
-        message: "Manager id?",
-        choices: [1, 3, 5, 7],
-      },
+      // {
+      //   name: "manager_id",
+      //   type: "list",
+      //   message: "Manager id?",
+      //   choices: [1, 3, 5, 7],
+      // },
     ])
     .then(function (ans) {
-      // WIP not working--->
       const first_name = ans.first_name;
       const last_name = ans.last_name;
       const role_id = ans.role_id;
-      const manager_id = ans.manager_id;
+      // const manager_id = ans.manager_id;
 
-      const sql = `INSERT INTO employee (first_name) 
+      const sql = `INSERT INTO employee (first_name,last_name,role_id) 
       VALUES (?)`;
-      const params = [first_name, last_name, role_id, manager_id];
+      const params = [first_name, last_name, role_id];
+
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Employee has not been added\n");
@@ -130,8 +126,6 @@ const addEmployee = function () {
       return choices();
     });
 };
-
-// update employee role(function to delete role and create role is that how we append does the new role appear here?)
 // We join the table which connect the name and role_id to the role.
 
 const updateRole = function () {
@@ -146,22 +140,31 @@ const updateRole = function () {
         name: "title",
         type: "list",
         message: "What is your new title?",
-        choices: [1, 2, , 3, 4],
+        choices: [
+          "Sales-Lead",
+          "Sales-Person",
+          "LeadEngineer",
+          "Software-Engineer",
+          "AccountManager",
+          "Accountant",
+          "LegalTeamLead",
+          "Lawyer",
+        ],
       },
     ])
-    //not sure here-->
+    //updates title.
     .then(function (ans) {
       const title = ans.title;
       const id = ans.id;
       const sql = `UPDATE roles SET title = ? WHERE id = ?`;
       const params = [title, id];
-      //WIP--->
+
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Role has not updated\n");
         } else {
           console.log("Role has now been updated\n");
-          sql;
+          result;
         }
       });
       return choices();
@@ -174,9 +177,9 @@ const allRoles = function () {
 
   db.query(sql, (err, rows) => {
     if (err) {
-      res.status(500).json({ error: err.message });
-      return;
+      console.log("Cannot view roles");
     }
+    //ref-https://developer.mozilla.org/en-US/docs/Web/API/console/table
     console.log("View roles\n");
     console.table(rows);
   });
@@ -270,7 +273,7 @@ const addDepartment = function () {
 const quit = function () {
   process.exit();
 };
-
+choices();
 // where routing is listening
 app.use((req, res) => {
   res.status(404).end();
