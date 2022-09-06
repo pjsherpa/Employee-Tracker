@@ -25,8 +25,6 @@ const db = mysql.createConnection(
   console.log(`Connected to the employeetracker_db.`)
 );
 
-choices();
-
 function choices() {
   inquirer
     .prompt([
@@ -67,7 +65,6 @@ function choices() {
       }
     });
 }
-
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 function showAllEmployees() {
   const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
@@ -75,14 +72,14 @@ function showAllEmployees() {
     if (err) {
       console.log("error");
     }
-    console.table(rows);
     console.log("Employees viewed!");
+    console.table(rows);
   });
   choices();
 }
 
 // add employee(function with more inquiry)WIP-->
-const addEmployee = function () {
+function addEmployee() {
   inquirer
     .prompt([
       {
@@ -126,9 +123,9 @@ const addEmployee = function () {
       });
       choices();
     });
-};
+}
 
-const updateRole = function () {
+function updateRole() {
   inquirer
     .prompt([
       {
@@ -170,10 +167,10 @@ const updateRole = function () {
       });
       choices();
     });
-};
+}
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
-const allRoles = function () {
+function allRoles() {
   const sql = `SELECT id, title, salary, department_id FROM roles`;
 
   db.query(sql, (err, rows) => {
@@ -186,10 +183,10 @@ const allRoles = function () {
     console.table(rows);
   });
   choices();
-};
+}
 
 // add role()(function add new role with more inquiry) --->done
-const addRole = function () {
+function addRole() {
   inquirer
     .prompt([
       {
@@ -229,9 +226,9 @@ const addRole = function () {
       });
       choices();
     });
-};
+}
 // view all department(invokes SELECT * employee_name which presents?)-->done
-const viewAllDepartments = function () {
+function viewAllDepartments() {
   const sql = `SELECT department_name title FROM department`;
 
   db.query(sql, (err, rows) => {
@@ -239,12 +236,13 @@ const viewAllDepartments = function () {
       console.log({ error: err.message });
     }
     console.table(rows);
+    console.log("\n");
   });
   choices();
-};
+}
 
 // add department(function create new department with inquiry questions)
-const addDepartment = function () {
+function addDepartment() {
   inquirer
     .prompt([
       {
@@ -271,11 +269,13 @@ const addDepartment = function () {
       });
       choices();
     });
-};
+}
 
-const quit = function () {
+function quit() {
   process.exit();
-};
+}
+
+choices();
 
 // where routing is listening
 app.use((req, res) => {
@@ -283,5 +283,5 @@ app.use((req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`\n Server running on port ${PORT}`);
 });
