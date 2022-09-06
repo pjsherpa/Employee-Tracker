@@ -112,16 +112,17 @@ const addEmployee = function () {
       const role_id = ans.role_id;
       const manager_id = ans.manager_id;
 
-      const sql = `INSERT INTO employee, (first_name,last_name,role_id, manager_id) 
+      const sql = `INSERT INTO employee (first_name) 
       VALUES (?)`;
       const params = [first_name, last_name, role_id, manager_id];
 
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Employee has not been added\n");
+          console.log(err);
         }
         console.log("Employee has now been added\n");
-        result;
+        sql;
       });
       choices();
     });
@@ -161,6 +162,7 @@ const updateRole = function () {
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Role has not updated\n");
+          console.log(err);
         } else {
           console.log("Role has now been updated\n");
           result;
@@ -177,6 +179,7 @@ const allRoles = function () {
   db.query(sql, (err, rows) => {
     if (err) {
       console.log("Cannot view roles");
+      console.log(err);
     }
     //ref-https://developer.mozilla.org/en-US/docs/Web/API/console/table
     console.log("View roles\n");
@@ -219,6 +222,7 @@ const addRole = function () {
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("No role added");
+          console.log(err);
         }
         console.log("New Role has now been added\n");
         sql;
@@ -260,6 +264,7 @@ const addDepartment = function () {
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Department has not been added\n");
+          console.log(err);
         }
         console.log("New Department has now been added\n");
         result;
