@@ -25,7 +25,9 @@ const db = mysql.createConnection(
   console.log(`Connected to the employeetracker_db.`)
 );
 
-const choices = function () {
+choices();
+
+function choices() {
   inquirer
     .prompt([
       {
@@ -64,7 +66,7 @@ const choices = function () {
         quit();
       }
     });
-};
+}
 
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 function showAllEmployees() {
@@ -76,9 +78,9 @@ function showAllEmployees() {
     console.table(rows);
     console.log("Employees viewed!");
   });
-  return choices();
+  choices();
 }
-// }
+
 // add employee(function with more inquiry)WIP-->
 const addEmployee = function () {
   inquirer
@@ -95,38 +97,35 @@ const addEmployee = function () {
       },
       {
         name: "role_id",
-        type: "list",
+        type: "input",
         message: "role id?",
-        choices: [1, 2, 3, 4, 5, 6],
       },
-      // {
-      //   name: "manager_id",
-      //   type: "list",
-      //   message: "Manager id?",
-      //   choices: [1, 3, 5, 7],
-      // },
+      {
+        name: "manager_id",
+        type: "input",
+        message: "Manager id?",
+      },
     ])
     .then(function (ans) {
       const first_name = ans.first_name;
       const last_name = ans.last_name;
       const role_id = ans.role_id;
-      // const manager_id = ans.manager_id;
+      const manager_id = ans.manager_id;
 
-      const sql = `INSERT INTO employee (first_name,last_name,role_id) 
+      const sql = `INSERT INTO employee, (first_name,last_name,role_id, manager_id) 
       VALUES (?)`;
-      const params = [first_name, last_name, role_id];
+      const params = [first_name, last_name, role_id, manager_id];
 
       db.query(sql, params, (err, result) => {
         if (err) {
           console.log("Employee has not been added\n");
         }
         console.log("Employee has now been added\n");
-        sql;
+        result;
       });
-      return choices();
+      choices();
     });
 };
-// We join the table which connect the name and role_id to the role.
 
 const updateRole = function () {
   inquirer
@@ -167,7 +166,7 @@ const updateRole = function () {
           result;
         }
       });
-      return choices();
+      choices();
     });
 };
 
@@ -183,7 +182,7 @@ const allRoles = function () {
     console.log("View roles\n");
     console.table(rows);
   });
-  return choices();
+  choices();
 };
 
 // add role()(function add new role with more inquiry) --->done
@@ -197,11 +196,10 @@ const addRole = function () {
       },
       {
         name: "salary",
-        type: "inputy",
+        type: "input",
         message: "How much is the salary for this role?",
       },
       {
-        //         //check department_id no. which is which. It has not been created yet in seed.
         name: "department_id",
         type: "list",
         message: "Which department does the role belong to?",
@@ -225,7 +223,7 @@ const addRole = function () {
         console.log("New Role has now been added\n");
         sql;
       });
-      return choices();
+      choices();
     });
 };
 // view all department(invokes SELECT * employee_name which presents?)-->done
@@ -234,11 +232,11 @@ const viewAllDepartments = function () {
 
   db.query(sql, (err, rows) => {
     if (err) {
-      res.status(500).json({ error: err.message });
+      console.log({ error: err.message });
     }
     console.table(rows);
   });
-  return choices();
+  choices();
 };
 
 // add department(function create new department with inquiry questions)
@@ -264,16 +262,16 @@ const addDepartment = function () {
           console.log("Department has not been added\n");
         }
         console.log("New Department has now been added\n");
-        sql;
+        result;
       });
-      return choices();
+      choices();
     });
 };
 
 const quit = function () {
   process.exit();
 };
-choices();
+
 // where routing is listening
 app.use((req, res) => {
   res.status(404).end();
