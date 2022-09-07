@@ -5,6 +5,7 @@
 
 const inquirer = require("inquirer");
 const mysql = require("mysql2");
+const cTable = require("console.table");
 
 // Connect to database
 const db = mysql.createConnection(
@@ -80,12 +81,10 @@ function addEmployee() {
     }
 
     // console.log(list);
-    for (let i = 0; i > list.length; i++) {
-      let title = list[i].title;
-      let id = list[i].roles.id;
-      lala.push(title, id);
-      console.info(choicesTobemade);
+    for (let i = 0; i < list.length; i++) {
+      choicesTobemade.push(list[i].title);
     }
+    // console.log(choicesTobemade);
   });
 
   inquirer
@@ -135,6 +134,17 @@ function addEmployee() {
 }
 
 function updateRole() {
+  let choicesTobemade = [];
+  const options = `SELECT id,title FROM roles`;
+  db.query(options, (err, list) => {
+    if (err) {
+      console.log(err);
+    }
+    for (let i = 0; i < list.length; i++) {
+      choicesTobemade.push(list[i].title);
+    }
+  });
+
   inquirer
     .prompt([
       {
@@ -146,16 +156,7 @@ function updateRole() {
         name: "title",
         type: "list",
         message: "What is your new title?",
-        choices: [
-          "Sales-Lead",
-          "Sales-Person",
-          "LeadEngineer",
-          "Software-Engineer",
-          "AccountManager",
-          "Accountant",
-          "LegalTeamLead",
-          "Lawyer",
-        ],
+        choices: choicesTobemade,
       },
     ])
     //updates title.
@@ -197,6 +198,17 @@ function allRoles() {
 // add role()(function add new role with more inquiry) --->done
 function addRole() {
   //WIP for all choices check how to update choices linking with db.
+  let choicesTobemade = [];
+  const options = `SELECT department_name FROM department`;
+  db.query(options, (err, list) => {
+    if (err) {
+      console.log(err);
+    }
+
+    for (let i = 0; i < list.length; i++) {
+      choicesTobemade.push(list[i].department_name);
+    }
+  });
 
   inquirer
     .prompt([
@@ -214,7 +226,7 @@ function addRole() {
         name: "department_id",
         type: "list",
         message: "Which department does the role belong to?",
-        choices: ["Engineering", "Finance", "Legal", "Sales", "Services"],
+        choices: choicesTobemade,
       },
     ])
 
