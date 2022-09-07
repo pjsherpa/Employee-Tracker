@@ -20,25 +20,24 @@ const db = mysql.createConnection(
 
 function choices() {
   inquirer
-    .prompt([
-      {
-        //add Bonus questions once this starts working
-        name: "office",
-        type: "list",
-        message: "What would you like to do?",
-        choices: [
-          "View All Employees",
-          "Add Employee",
-          "Update Employee Role",
-          "View all roles",
-          "Add Role",
-          "View All Departments",
-          "Add Department",
-          "Quit",
-        ],
-      },
-    ])
+    .prompt({
+      //add Bonus questions once this starts working
+      name: "office",
+      type: "list",
+      message: "What would you like to do?",
+      choices: [
+        "View All Employees",
+        "Add Employee",
+        "Update Employee Role",
+        "View all roles",
+        "Add Role",
+        "View All Departments",
+        "Add Department",
+        "Quit",
+      ],
+    })
     .then(function (select) {
+      console.log(select);
       if (select.office === "View All Employees") {
         showAllEmployees();
       } else if (select.office === "Add Employee") {
@@ -63,16 +62,32 @@ function showAllEmployees() {
   const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
   db.query(sql, (err, rows) => {
     if (err) {
-      console.log("error");
+      console.log(err);
     }
     console.log("Employees viewed!");
     console.table(rows);
+    choices();
   });
-  choices();
 }
 
 // add employee(function with more inquiry)WIP-->
 function addEmployee() {
+  let choicesTobemade = [];
+  const options = `SELECT id,title FROM roles`;
+  db.query(options, (err, list) => {
+    if (err) {
+      console.log(err);
+    }
+
+    // console.log(list);
+    for (let i = 0; i > list.length; i++) {
+      let title = list[i].title;
+      let id = list[i].roles.id;
+      lala.push(title, id);
+      console.info(choicesTobemade);
+    }
+  });
+
   inquirer
     .prompt([
       {
@@ -87,8 +102,9 @@ function addEmployee() {
       },
       {
         name: "role_id",
-        type: "input",
+        type: "list",
         message: "role id?",
+        choices: choicesTobemade,
       },
       {
         name: "manager_id",
@@ -174,12 +190,14 @@ function allRoles() {
     //ref-https://developer.mozilla.org/en-US/docs/Web/API/console/table
     console.log("View roles\n");
     console.table(rows);
+    choices();
   });
-  choices();
 }
 
 // add role()(function add new role with more inquiry) --->done
 function addRole() {
+  //WIP for all choices check how to update choices linking with db.
+
   inquirer
     .prompt([
       {
@@ -229,9 +247,8 @@ function viewAllDepartments() {
       console.log({ error: err.message });
     }
     console.table(rows);
-    console.log("\n");
+    choices();
   });
-  choices();
 }
 
 // add department(function create new department with inquiry questions)
