@@ -60,7 +60,16 @@ function choices() {
 }
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 function showAllEmployees() {
-  const sql = `SELECT employee.first_name,employee.last_name,roles.title, department.department_name,roles.salary,employee.manager_id FROM department INNER JOIN roles ON department.id=roles.department_id INNER JOIN employee ON roles.id=employee.role_id ORDER BY department.id;`;
+  const sql = `SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, employee.manager_id,
+  CONCAT(manager.first_name,' ',manager.last_name) AS manager
+  FROM employee
+  LEFT JOIN roles
+  ON employee.role_id=roles.id
+  LEFT JOIN department
+  ON roles.department_id=department.id
+  LEFT JOIN employee manager 
+  ON manager.id =employee.manager_id
+  ORDER BY department.id;`;
   db.query(sql, (err, rows) => {
     if (err) {
       console.log(err);
