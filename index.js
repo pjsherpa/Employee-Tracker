@@ -68,8 +68,7 @@ function showAllEmployees() {
   LEFT JOIN department
   ON roles.department_id=department.id
   LEFT JOIN employee manager 
-  ON manager.id =employee.manager_id
-  ORDER BY department.id;`;
+  ON manager.id =employee.manager_id`;
   db.query(sql, (err, rows) => {
     if (err) {
       console.log(err);
@@ -82,64 +81,56 @@ function showAllEmployees() {
 
 // add employee(function with more inquiry)WIP-->
 function addEmployee() {
-  let choicesTobemade = [];
-  const options = `SELECT id,title FROM roles`;
-  db.query(options, (err, list) => {
-    if (err) {
-      console.log(err);
-    }
-
-    // console.log(list);
-    for (let i = 0; i < list.length; i++) {
-      choicesTobemade.push(list[i].title);
-    }
-    // console.log(choicesTobemade);
-  });
-
-  inquirer
-    .prompt([
-      {
-        name: "first_name",
-        type: "input",
-        message: "What is your first name?",
-      },
-      {
-        name: "last_name",
-        type: "input",
-        message: "What is your last name?",
-      },
-      {
-        name: "role_id",
-        type: "list",
-        message: "role id?",
-        choices: choicesTobemade,
-      },
-      {
-        name: "manager_id",
-        type: "input",
-        message: "Manager id?",
-      },
-    ])
-    .then(function (ans) {
-      const first_name = ans.first_name;
-      const last_name = ans.last_name;
-      const role_id = ans.role_id;
-      const manager_id = ans.manager_id;
-
-      const sql = `INSERT INTO employee (first_name) 
-      VALUES (?)`;
-      const params = [first_name, last_name, role_id, manager_id];
-
-      db.query(sql, params, (err, result) => {
-        if (err) {
-          console.log("Employee has not been added\n");
-          console.log(err);
-        }
-        console.log("Employee has now been added\n");
-        sql;
-      });
-      choices();
+  db.query("SELECT * FROM roles", (err, result) => {
+    if (err) console.log(err);
+    result = result.map((role) => {
+      return {
+        name: role.title,
+        value: role.id,
+      };
     });
+    inquirer
+      .prompt([
+        {
+          name: "first_name",
+          type: "input",
+          message: "What is your first name?",
+        },
+        {
+          name: "last_name",
+          type: "input",
+          message: "What is your last name?",
+        },
+        {
+          name: "role_id",
+          type: "list",
+          message: "role id?",
+          choices: result,
+        },
+        {
+          name: "manager_id",
+          type: "list",
+          message: "select a manager id...",
+          choices: [1, 3, 5, 7],
+        },
+      ])
+      .then((data) => {
+        db.query(
+          "INSERT INTO employee SET ?",
+          {
+            first_name: data.first_name,
+            last_name: data.last_name,
+            role_id: data.role_id,
+            manager_id: data.manager_id,
+          },
+          (err) => {
+            if (err) throw err;
+            console.log("Employee has not been added\n");
+            choices();
+          }
+        );
+      });
+  });
 }
 
 function updateRole() {
