@@ -1,4 +1,4 @@
-// first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i express
+// first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i express, npm i console.table package
 //check which ones requires input list and choices and choices needs to be migrated from database.
 
 //node index.js to invoke.
@@ -60,7 +60,7 @@ function choices() {
 }
 // view all employees(invokes SELECT * employee_name which presents?) -->done
 function showAllEmployees() {
-  const sql = `SELECT employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, employee.manager_id,
+  const sql = `SELECT employee.id,employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, employee.manager_id,
   CONCAT(manager.first_name,' ',manager.last_name) AS manager
   FROM employee
   LEFT JOIN roles
@@ -81,7 +81,8 @@ function showAllEmployees() {
 
 // add employee(function with more inquiry)WIP-->
 function addEmployee() {
-  db.query("SELECT * FROM roles", (err, result) => {
+  const sql = "SELECT * FROM roles";
+  db.query(sql, (err, result) => {
     if (err) console.log(err);
     result = result.map((role) => {
       return {
@@ -124,7 +125,9 @@ function addEmployee() {
             manager_id: data.manager_id,
           },
           (err) => {
-            if (err) throw err;
+            if (err) {
+              console.log({ error: err.message });
+            }
             console.log("Employee has not been added\n");
             choices();
           }
@@ -134,49 +137,64 @@ function addEmployee() {
 }
 
 function updateRole() {
-  let choicesTobemade = [];
-  const options = `SELECT id,title FROM roles`;
-  db.query(options, (err, list) => {
+  db.query("SELECT * FROM employee", (err, result) => {
     if (err) {
       console.log(err);
     }
-    for (let i = 0; i < list.length; i++) {
-      choicesTobemade.push(list[i].title);
-    }
-  });
-
-  inquirer
-    .prompt([
-      {
-        name: "id",
-        type: "input",
-        message: "What is your id number?",
-      },
-      {
-        name: "title",
-        type: "list",
-        message: "What is your new title?",
-        choices: choicesTobemade,
-      },
-    ])
-    //updates title.
-    .then(function (ans) {
-      const title = ans.title;
-      const id = ans.id;
-      const sql = `UPDATE roles SET title = ? WHERE id = ?`;
-      const params = [title, id];
-
-      db.query(sql, params, (err, result) => {
-        if (err) {
-          console.log("Role has not updated\n");
-          console.log(err);
-        } else {
-          console.log("Role has now been updated\n");
-          result;
-        }
-      });
-      choices();
+    result = result.map((employee) => {
+      return {
+        name: `${employee.first_name} ${employee.last_name}`,
+        value: employee.id,
+      };
     });
+    db.query("SELECT * FROM roles", (err, list) => {
+      if (err) {
+        console.log(err);
+      }
+      list = list.map((role) => {
+        return {
+          name: role.title,
+          value: role.id,
+        };
+      });
+      inquirer
+        .prompt([
+          {
+            name: "id",
+            type: "list",
+            message: "Please select your name",
+            choices: result,
+          },
+          {
+            name: "title",
+            type: "list",
+            message: "Please select your new name",
+            choices: list,
+          },
+        ])
+        .then((data) => {
+          db.query(
+            "UPDATE employee SET ? WHERE ?",
+            [
+              {
+                role_id: data.title,
+              },
+              {
+                id: data.id,
+              },
+            ],
+            function (err) {
+              if (err) {
+                console.log("Role has not updated\n");
+                console.log(err);
+              }
+            }
+          );
+          console.log("Role has now been updated\n");
+          choices();
+        });
+    });
+  });
 }
 
 // view all roles(invokes SELECT * employee_name which presents?)--->done
@@ -197,59 +215,54 @@ function allRoles() {
 
 // add role()(function add new role with more inquiry) --->done
 function addRole() {
-  //WIP for all choices check how to update choices linking with db.
-  let choicesTobemade = [];
-  const options = `SELECT department_name FROM department`;
-  db.query(options, (err, list) => {
-    if (err) {
-      console.log(err);
-    }
-
-    for (let i = 0; i < list.length; i++) {
-      choicesTobemade.push(list[i].department_name);
-    }
-  });
-
-  inquirer
-    .prompt([
-      {
-        name: "title",
-        type: "input",
-        message: "Add new Role title:",
-      },
-      {
-        name: "salary",
-        type: "input",
-        message: "How much is the salary for this role?",
-      },
-      {
-        name: "department_id",
-        type: "list",
-        message: "Which department does the role belong to?",
-        choices: choicesTobemade,
-      },
-    ])
-
-    .then(function (ans) {
-      const title = ans.title;
-      const salary = ans.salary;
-      const department_id = ans.department_id;
-
-      const sql = `INSERT INTO roles (title)
-    VALUES (?)`;
-      const params = [title, salary, department_id];
-
-      db.query(sql, params, (err, result) => {
-        if (err) {
-          console.log("No role added");
-          console.log(err);
-        }
-        console.log("New Role has now been added\n");
-        sql;
-      });
-      choices();
+  const sql = `SELECT * FROM department`;
+  db.query(sql, (err, departments) => {
+    if (err) console.log(err);
+    departments = departments.map((department) => {
+      return {
+        name: department.department_name,
+        value: department.id,
+      };
     });
+    inquirer
+      .prompt([
+        {
+          name: "title",
+          type: "input",
+          message: "Add new Role title:",
+        },
+        {
+          name: "salary",
+          type: "input",
+          message: "How much is the salary for this role?",
+        },
+        {
+          name: "department_id",
+          type: "list",
+          message: "Which department does the role belong to?",
+          choices: departments,
+        },
+      ])
+      .then((ans) => {
+        db.query(
+          "INSERT INTO roles SET ?",
+          {
+            title: ans.title,
+            salary: ans.salary,
+            department_id: ans.department_id,
+          },
+          function (err) {
+            if (err) {
+              console.log({ error: err.message });
+            }
+          }
+        );
+        console.log("added new employee role!");
+        choices();
+      });
+  });
 }
+
 // view all department(invokes SELECT * employee_name which presents?)-->done
 function viewAllDepartments() {
   const sql = `SELECT department_name title FROM department`;
