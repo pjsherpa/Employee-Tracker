@@ -34,41 +34,41 @@ Github:
 https://github.com/pjsherpa/Employee-Tracker
 
 
-###Video Walkthrough
+### Video Walkthrough
 
 [Pj's Walkthrough Video](https://drive.google.com/file/d/1e0hsDaHJKM2TElZz-NKqeof3ldEzeluj/view)
 
-###Screenshots
+### Screenshots
 
-#img1: 
+# img1: 
 
 ![img1](https://user-images.githubusercontent.com/105903416/189236499-653c88db-82e4-410f-88e8-2f5573b6fa35.png)
 
-#img2:
+# img2:
 
 ![2](https://user-images.githubusercontent.com/105903416/189236547-e3d4bf87-fe55-4238-b057-4aba16f982d2.png)
 
-#img3:
+# img3:
 
 ![im2](https://user-images.githubusercontent.com/105903416/189236577-cacfb1f9-5ef8-46d3-a0d4-ea67a5d4bd5c.png)
 
-#img4:
+# img4:
 
 ![inmg3](https://user-images.githubusercontent.com/105903416/189236593-3a539bc3-f19b-4b47-925b-52abb2ab9fca.png)
 
-#img5:
+# img5:
 
 ![img4](https://user-images.githubusercontent.com/105903416/189236618-57389110-f398-4f02-adef-41acbe2aad4f.png)
 
-#img6:
+# img6:
 
 ![img5](https://user-images.githubusercontent.com/105903416/189236631-9cf66c69-21ea-492c-bac7-5aaf04526ae9.png)
 
-#img7:
+# img7:
 
 ![img 6](https://user-images.githubusercontent.com/105903416/189236651-53c8296b-e5d2-41f1-be41-70fe736fee00.png)
 
-#img8:
+# img8:
 
 ![img 7](https://user-images.githubusercontent.com/105903416/189236665-4b1aeab3-9e8c-4fd9-9667-27d34622e9eb.png)
 
