@@ -1,4 +1,4 @@
-// first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i express, npm i console.table package
+// first thing I would do is install npm packages npm i, npm i inquirer, npm i mysql2, npm i console.table package
 //check which ones requires input list and choices and choices needs to be migrated from database.
 
 //node index.js to invoke.
@@ -7,7 +7,7 @@ const inquirer = require("inquirer");
 const mysql = require("mysql2");
 const cTable = require("console.table");
 
-// Connect to database
+// Connect to mysql Server database
 const db = mysql.createConnection(
   {
     host: "localhost",
@@ -22,7 +22,6 @@ const db = mysql.createConnection(
 function choices() {
   inquirer
     .prompt({
-      //add Bonus questions once this starts working
       name: "office",
       type: "list",
       message: "What would you like to do?",
@@ -58,7 +57,7 @@ function choices() {
       }
     });
 }
-// view all employees(invokes SELECT * employee_name which presents?) -->done
+// view all employees
 function showAllEmployees() {
   const sql = `SELECT employee.id,employee.first_name, employee.last_name, roles.title, department.department_name, roles.salary, employee.manager_id,
   CONCAT(manager.first_name,' ',manager.last_name) AS manager
@@ -79,7 +78,7 @@ function showAllEmployees() {
   });
 }
 
-// add employee(function with more inquiry)WIP-->
+// add employee
 function addEmployee() {
   const sql = "SELECT * FROM roles";
   db.query(sql, (err, result) => {
@@ -126,9 +125,10 @@ function addEmployee() {
           },
           (err) => {
             if (err) {
-              console.log({ error: err.message });
+              console.log(err);
+              console.log("Employee has not been added\n");
             }
-            console.log("Employee has not been added\n");
+            console.log("Employee has now been added\n");
             choices();
           }
         );
@@ -197,7 +197,7 @@ function updateRole() {
   });
 }
 
-// view all roles(invokes SELECT * employee_name which presents?)--->done
+// view all roles
 function allRoles() {
   const sql = `SELECT id, title, salary, department_id FROM roles`;
 
@@ -213,11 +213,13 @@ function allRoles() {
   });
 }
 
-// add role()(function add new role with more inquiry) --->done
+// add role
 function addRole() {
   const sql = `SELECT * FROM department`;
   db.query(sql, (err, departments) => {
-    if (err) console.log(err);
+    if (err) {
+      console.log(err);
+    }
     departments = departments.map((department) => {
       return {
         name: department.department_name,
@@ -253,7 +255,8 @@ function addRole() {
           },
           function (err) {
             if (err) {
-              console.log({ error: err.message });
+              console.log(err);
+              console.log("No new employee role!");
             }
           }
         );
@@ -263,9 +266,9 @@ function addRole() {
   });
 }
 
-// view all department(invokes SELECT * employee_name which presents?)-->done
+// view all department
 function viewAllDepartments() {
-  const sql = `SELECT department_name title FROM department`;
+  const sql = `SELECT id, department_name title FROM department`;
 
   db.query(sql, (err, rows) => {
     if (err) {
@@ -286,7 +289,7 @@ function addDepartment() {
         message: "Add new department name:",
       },
     ])
-    // Step2:express bit read from choice made?
+
     .then(function (ans) {
       const department_name = ans.department_name;
 
