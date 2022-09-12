@@ -16,7 +16,7 @@ The employee tracker was built to demonstarte an interface that allows non-devel
 How it works?
 
 1. Execute using index.js 
-2. List displayed. [img1)(#img1).
+2. List displayed. [img1](#img1).
 3. View all employees select[img2](#img2).
 4. Add employee select.Display set of questions[img3](#img3). Once questions filled in adds new employee whose title autofills the department and salary, manager has to be selected.
 5. Update employee role select. Display set of questions[img4](#img4). Once questions filled in updates role whose title autofills the department and salary.
